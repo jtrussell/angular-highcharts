@@ -1,0 +1,21 @@
+{
+  "name": "angular-highcharts",
+  "version": "0.0.0",
+  "description": "Highcharts charting directive for AngularJS",
+  "main": "angular-highcharts.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "htts://github.com/jrussell-ivantage/angular-highcharts"
+  },
+  "keywords": [
+    "angular",
+    "highcharts",
+    "chart"
+  ],
+  "author": "Justin Russell",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
