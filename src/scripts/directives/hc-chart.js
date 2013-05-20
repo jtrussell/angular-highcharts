@@ -1,4 +1,4 @@
-angular.module('hc', []);
+/*global angular, Highcharts */
 
 angular.module('hc').directive('hcChart', function() {
   'use strict';
