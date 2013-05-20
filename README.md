@@ -51,6 +51,9 @@ $scope.chartConfig = {/* ... */};
 <div hc-chart="chartConfig"></div>
 ```
 
+*NOTE: The `renderTo` will always be overridden to reference the element the
+`hc-chart` directive is attached to.
+
 [Demo](#)
 
 # Tests
