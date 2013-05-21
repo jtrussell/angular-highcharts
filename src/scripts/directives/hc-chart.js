@@ -22,6 +22,7 @@ angular.module('hc').directive('hcChart', function() {
       series: '=series',
       subtitle: '=subtitle',
       title: '=title',
+      tooltip: '=tooltip',
       xAxis: '=xAxis',
       yAxis: '=yAxis',
 
@@ -30,8 +31,10 @@ angular.module('hc').directive('hcChart', function() {
       seriesName: '=seriesName',
       seriesType: '=seriesType',
 
+      subtitleText: '=subtitleText',
       titleText: '=titleText',
 
+      // [implement /]
       tooltipFormatter: '=tooltipFormatter'
     },
     template: [
@@ -55,11 +58,9 @@ angular.module('hc').directive('hcChart', function() {
         chart: scope.chart || {
           renderTo: element[0]
         },
+        //colors: scope.colors || undefined,
         credits: scope.credits || {
           enabled: false
-        },
-        title: scope.title || {
-          text: scope.titleText || 'Chart Title'
         },
         plotOptions: scope.plotOptions || {
           pie: {
@@ -78,14 +79,174 @@ angular.module('hc').directive('hcChart', function() {
         },
         series: scope.series || [{
           type: scope.seriesType || 'pie',
-          name: scope.seriesName || 'Data',
+          name: scope.seriesName || null,
           data: scope.seriesData || []
-        }]
+        }],
+        subtitle: scope.subtitle || {
+          text: scope.subtitleText || null
+        },
+        title: scope.title || {
+          text: scope.titleText || null
+        },
+        tooltip: scope.tooltip || {
+          formatter: scope.tooltipFormatter || null
+        }
       });
 
-      scope.$watch('seriesData', function(newData) {
-        chart.series[0].setData(newData, true);
-      }, true);
+      // -----------------------------------------------------
+      // Watch grand ol' config
+      // -----------------------------------------------------
+
+      scope.$watch('config', function(newVal) {
+        if(!newVal) { return; }
+        chart.destroy();
+        chart = new Highcharts.chart(newVal);
+      });
+
+      // -----------------------------------------------------
+      // Watch top level options
+      // -----------------------------------------------------
+
+      scope.$watch('chart', function(newVal) {
+        if(!newVal) { return; }
+        chart.chart = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('colors', function(newVal) {
+        if(!newVal) { return; }
+        chart.colors = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('credits', function(newVal) {
+        if(!newVal) { return; }
+        chart.credits = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('exporting', function(newVal) {
+        if(!newVal) { return; }
+        chart.exporting = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('labels', function(newVal) {
+        if(!newVal) { return; }
+        chart.labels = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('loading', function(newVal) {
+        if(!newVal) { return; }
+        chart.loading = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('legend', function(newVal) {
+        if(!newVal) { return; }
+        chart.legend = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('navigation', function(newVal) {
+        if(!newVal) { return; }
+        chart.navigation = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('pane', function(newVal) {
+        if(!newVal) { return; }
+        chart.pane = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('plotOptions', function(newVal) {
+        if(!newVal) { return; }
+        chart.plotOptions = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('series', function(newVal) {
+        if(!newVal) { return; }
+        chart.series = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('subtitle', function(newVal) {
+        if(!newVal) { return; }
+        chart.subtitle = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('title', function(newVal) {
+        if(!newVal) { return; }
+        chart.title = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('xAxis', function(newVal) {
+        if(!newVal) { return; }
+        chart.xAxis = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('xAxis', function(newVal) {
+        if(!newVal) { return; }
+        chart.xAxis = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('yAxis', function(newVal) {
+        if(!newVal) { return; }
+        chart.yAxis = newVal;
+        chart.redraw();
+      });
+
+      scope.$watch('series', function(newVal) {
+        if(!newVal) { return; }
+        chart.series = newVal;
+        chart.redraw();
+      });
+
+      // -----------------------------------------------------
+      // Watch the convenience options
+      // -----------------------------------------------------
+
+      // Used when we have a single series
+      scope.$watch('seriesData', function(newVal) {
+        if(!newVal) { return; }
+        chart.series[0].setData(newVal);
+      });
+
+      // Used when we have a single series
+      scope.$watch('seriesName', function(newVal) {
+        if(!newVal) { return; }
+        chart.series[0].update('name', newVal);
+      });
+
+      // Used when we have a single series
+      scope.$watch('seriesType', function(newVal) {
+        if(!newVal) { return; }
+        chart.series[0].update('type', newVal);
+      });
+
+      scope.$watch('subtitleText', function(newVal) {
+        if(!newVal) { return; }
+        chart.setTitle({text: (chart.title || {}).text || ''}, {text: newVal});
+      });
+
+      scope.$watch('titleText', function(newVal) {
+        if(!newVal) { return; }
+        chart.setTitle({text: newVal}, {text: (chart.subtitle || {}).text || ''});
+      });
+
+      scope.$watch('tooltipFormatter', function(newVal) {
+        if(!newVal) { return; }
+        chart.tooltipFormatter = newVal;
+        chart.redraw();
+      });
+
     }
   };
 });
