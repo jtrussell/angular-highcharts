@@ -27,6 +27,8 @@ angular.module('hc').directive('hcChart', function() {
       yAxis: '=yAxis',
 
       // some handy shortcuts
+      chartBackgroundColor: '=chartBackgroundColor',
+
       seriesData: '=seriesData',
       seriesName: '=seriesName',
       seriesType: '=seriesType',
@@ -56,9 +58,10 @@ angular.module('hc').directive('hcChart', function() {
 
       var chart = new Highcharts.Chart(scope.config || {
         chart: scope.chart || {
-          renderTo: element[0]
+          renderTo: element[0],
+          // [note] Changed default [/note]
+          backgroundColor: scope.chartBackgroundColor || 'transparent'
         },
-        //colors: scope.colors || undefined,
         credits: scope.credits || {
           enabled: false
         },
@@ -212,6 +215,12 @@ angular.module('hc').directive('hcChart', function() {
       // -----------------------------------------------------
       // Watch the convenience options
       // -----------------------------------------------------
+
+      scope.$watch('chartBackgroundColor', function(newVal) {
+        if(!newVal) { return; }
+        chart.backgroundColor = newVal;
+        chart.redraw();
+      });
 
       // Used when we have a single series
       scope.$watch('seriesData', function(newVal) {
