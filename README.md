@@ -57,3 +57,9 @@ $scope.chartConfig = {/* ... */};
 [Demo](#)
 
 # Tests
+
+_(coming soon)_
+
+# License
+
+[MIT](https://raw.github.com/jrussell-ivantage/angular-highcharts/master/LICENSE-MIT)
