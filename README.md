@@ -10,9 +10,9 @@ An AngularJS directive for creating Hightcharts charts.
 
 ```javascript
 $scope.chartData = [
-  ['foo': 1],
-  ['bar': 2],
-  ['wowza': 3]
+  ['foo', 1],
+  ['bar', 2],
+  ['wowza', 3]
 ];
 ```
 
