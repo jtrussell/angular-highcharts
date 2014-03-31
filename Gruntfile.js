@@ -61,6 +61,15 @@ module.exports = function(grunt) {
           expand: true
         }]
       }
+    },
+
+    bump: {
+      options: {
+        commitMessage: 'chore: Bump for release (v%VERSION%)',
+        files: ['package.json', 'bower.json'],
+        commitFiles: ['-a'],
+        push: false
+      }
     }
   });
 
