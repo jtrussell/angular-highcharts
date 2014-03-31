@@ -1,9 +1,9 @@
 angular.module('hc', []);
 
-angular.module('hc').directive('hcChart', function() {
+angular.module('hc').directive('hcChart', function($rootScope) {
   'use strict';
   return {
-    replace: true,
+    restrict: 'EA',
     scope: {
       // whole config
       config: '=hcChart',
@@ -40,7 +40,7 @@ angular.module('hc').directive('hcChart', function() {
       tooltipFormatter: '=tooltipFormatter'
     },
     template: [
-      '<div class="hc-chart hc-pie">',
+      '<div class="hc-chart">',
         '<span class="hc-chart-loading"></span>',
       '</div>'
     ].join(''),
@@ -59,12 +59,9 @@ angular.module('hc').directive('hcChart', function() {
       var chart = new Highcharts.Chart(scope.config || {
         chart: scope.chart || {
           renderTo: element[0],
-          // [note] Changed default [/note]
           backgroundColor: scope.chartBackgroundColor || 'transparent'
         },
-        credits: scope.credits || {
-          enabled: false
-        },
+        credits: scope.credits || { enabled: false },
         plotOptions: scope.plotOptions || {
           pie: {
             allowPointSelect: true,
@@ -206,12 +203,6 @@ angular.module('hc').directive('hcChart', function() {
         chart.redraw();
       });
 
-      scope.$watch('series', function(newVal) {
-        if(!newVal) { return; }
-        chart.series = newVal;
-        chart.redraw();
-      });
-
       // -----------------------------------------------------
       // Watch the convenience options
       // -----------------------------------------------------
@@ -226,7 +217,7 @@ angular.module('hc').directive('hcChart', function() {
       scope.$watch('seriesData', function(newVal) {
         if(!newVal) { return; }
         chart.series[0].setData(newVal);
-      });
+      }, true);
 
       // Used when we have a single series
       scope.$watch('seriesName', function(newVal) {

@@ -12,10 +12,15 @@ module.exports = function(grunt) {
         'src/**/*.js'
       ],
       tasks: [
-        'default'
+        'pages'
         //'jshint'
         //'test'
       ]
+    },
+    
+    clean: {
+      dist: 'dist/*.{js,css}',
+      pages: 'pages/bower_components/angular-highcharts/**'
     },
 
     jshint: {
@@ -32,18 +37,29 @@ module.exports = function(grunt) {
           stripBanners: true
         },
         src: [
-          'src/scripts/*.js',
-          'src/scripts/*/*.js'
+          'src/scripts/module.js',
+          'src/scripts/**/*.js'
         ],
-        dest: 'angular-highcharts.js'
+        dest: 'dist/angular-highcharts.js'
       }
     },
 
     uglify: {
       production: {
         files: {
-          'angular-highcharts.min.js': 'angular-highcharts.js'
+          'dist/angular-highcharts.min.js': 'dist/angular-highcharts.js'
         }
+      }
+    },
+
+    copy: {
+      pages: {
+        files: [{
+          src: '**',
+          dest: 'pages/bower_components/angular-highcharts/',
+          cwd: 'dist/',
+          expand: true
+        }]
       }
     }
   });
@@ -55,8 +71,15 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'jshint',
     //'test',
+    'clean:dist',
     'concat',
     'uglify'
+  ]);
+
+  grunt.registerTask('pages', [
+    'default',
+    'clean:pages',
+    'copy:pages'
   ]);
 
 };
