@@ -1,0 +1,22 @@
+{
+  "name": "angular-highcharts",
+  "version": "0.0.2",
+  "homepage": "https://github.com/jtrussell/angular-highcharts",
+  "authors": [
+    "jtrussell"
+  ],
+  "description": "Highcharts charting directives for AngularJS",
+  "main": "dist/angular-highcharts.js",
+  "keywords": [
+    "Highcharts",
+    "Angular"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
