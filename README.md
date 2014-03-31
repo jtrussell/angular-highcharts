@@ -62,4 +62,4 @@ _(coming soon)_
 
 # License
 
-[MIT](https://raw.github.com/jrussell-ivantage/angular-highcharts/master/LICENSE-MIT)
+[MIT](https://raw.github.com/jtrussell/angular-highcharts/master/LICENSE-MIT)
