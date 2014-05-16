@@ -48,7 +48,8 @@ angular.module('hc').directive('hcChart', function($rootScope) {
 
       // Make sure we always render the chart to the element this directive is
       // attached to
-      if(scope.config && scope.config.chart) {
+      if(scope.config) {
+        scope.config.chart = scope.config.chart || {};
         scope.config.chart.renderTo = element[0];
       }
 
@@ -100,7 +101,7 @@ angular.module('hc').directive('hcChart', function($rootScope) {
       scope.$watch('config', function(newVal) {
         if(!newVal) { return; }
         chart.destroy();
-        chart = new Highcharts.chart(newVal);
+        chart = new Highcharts.Chart(newVal);
       });
 
       // -----------------------------------------------------
