@@ -4,6 +4,12 @@
 
 An AngularJS directive for creating Hightcharts charts.
 
+# Installing
+
+```
+bower install --save jtrusell/angular-highcharts
+```
+
 # Usage
 
 ## With convenient config options...
