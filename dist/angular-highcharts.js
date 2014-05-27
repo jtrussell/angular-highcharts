@@ -1,253 +1,124 @@
 angular.module('hc', []);
 
-angular.module('hc').directive('hcChart', function($rootScope) {
+angular.module('hc').directive('highchart', ['hcOptions', function(hcSettings) {
   'use strict';
   return {
     restrict: 'EA',
-    scope: {
-      // whole config
-      config: '=hcChart',
-
-      // top level highcharts opts
-      chart: '=chart',
-      colors: '=colors',
-      credits: '=credits',
-      exporting: '=exporting',
-      labels: '=labels',
-      loading: '=loading',
-      legend: '=legend',
-      navigation: '=navigation',
-      pane: '=pane',
-      plotOptions: '=plotOptions',
-      series: '=series',
-      subtitle: '=subtitle',
-      title: '=title',
-      tooltip: '=tooltip',
-      xAxis: '=xAxis',
-      yAxis: '=yAxis',
-
-      // some handy shortcuts
-      chartBackgroundColor: '=chartBackgroundColor',
-
-      seriesData: '=seriesData',
-      seriesName: '=seriesName',
-      seriesType: '=seriesType',
-
-      subtitleText: '=subtitleText',
-      titleText: '=titleText',
-
-      // [implement /]
-      tooltipFormatter: '=tooltipFormatter'
-    },
     template: [
       '<div class="hc-chart">',
-        '<span class="hc-chart-loading"></span>',
+        '<div class="hc-chart-loading"></div>',
       '</div>'
     ].join(''),
     link: function(scope, element, attrs) {
 
-      // Make sure we always render the chart to the element this directive is
-      // attached to
-      if(scope.config) {
-        scope.config.chart = scope.config.chart || {};
-        scope.config.chart.renderTo = element[0];
-      }
+      var chartOpts = [];
 
-      if(scope.chart) {
-        scope.chart.renderTo = element[0];
-      }
+      angular.forEach(attrs, function(val, key) {
+        if(key.indexOf('hc') === 0 && key.length > 2 && val) {
+          // Oh snap! It's a highcharts config item!
+          var keyParts = attrs
+            .$attr[key] // raw attribute name
+            .replace(/^((data|x)-)?hc[:-]/, '') // remove hc- prefix
+            .split('-');
 
-      var chart = new Highcharts.Chart(scope.config || {
-        chart: scope.chart || {
-          renderTo: element[0],
-          backgroundColor: scope.chartBackgroundColor || 'transparent'
-        },
-        credits: scope.credits || { enabled: false },
-        plotOptions: scope.plotOptions || {
-          pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-              enabled: true,
-              color: '#000000',
-              connectorColor: '#000000',
-              formatter: function () {
-                return '<b>' + this.point.name + '</b>: ' +
-                    Math.round(this.percentage) + ' %';
-              }
-            }
-          }
-        },
-        series: scope.series || [{
-          type: scope.seriesType || 'pie',
-          name: scope.seriesName || null,
-          data: scope.seriesData || []
-        }],
-        subtitle: scope.subtitle || {
-          text: scope.subtitleText || null
-        },
-        title: scope.title || {
-          text: scope.titleText || null
-        },
-        tooltip: scope.tooltip || {
-          formatter: scope.tooltipFormatter || null
+          chartOpts.push({
+            attr: key,
+            path: keyParts,
+            pathDepth: keyParts.length,
+            val: val
+          });
         }
       });
 
-      // -----------------------------------------------------
-      // Watch grand ol' config
-      // -----------------------------------------------------
-
-      scope.$watch('config', function(newVal) {
-        if(!newVal) { return; }
-        chart.destroy();
-        chart = new Highcharts.Chart(newVal);
+      // Make sure the most general config opts are handled first
+      chartOpts.sort(function(a, b) {
+        if(a.pathDepth === b.pathDepth) {
+          return 0;
+        }
+        return a.pathDepth < b.pathDepth ? -1 : 1;
       });
 
-      // -----------------------------------------------------
-      // Watch top level options
-      // -----------------------------------------------------
+      var buildConfig = function() {
 
-      scope.$watch('chart', function(newVal) {
-        if(!newVal) { return; }
-        chart.chart = newVal;
-        chart.redraw();
-      });
+        // We're going to do mean things to this array
+        var chartOpt = angular.copy(chartOpt);
 
-      scope.$watch('colors', function(newVal) {
-        if(!newVal) { return; }
-        chart.colors = newVal;
-        chart.redraw();
-      });
+        // The config object we'll ultimately hand off to the constructor, we
+        // may have been handed a top level config object but if not just start
+        // with an empty object
+        var config = chartOpts.length && chartOpts[0].pathDepth === 0 ?
+          scope.$eval(chartOpts.shift()) : {};
 
-      scope.$watch('credits', function(newVal) {
-        if(!newVal) { return; }
-        chart.credits = newVal;
-        chart.redraw();
-      });
+        // Apply config options in order of specificity, most general to most
+        // specific
+        angular.forEach(chartOpts, function(opt) {
+          var ix, pathPart, arrayPos, config = this;
+          for(ix = 0; ix < opt.pathDepth; ix++) {
+            pathPart = opt.path[ix];
 
-      scope.$watch('exporting', function(newVal) {
-        if(!newVal) { return; }
-        chart.exporting = newVal;
-        chart.redraw();
-      });
+            // Could be part of an array...
+            if(/(\w+)\[(\d+)\]$/.exec(pathPart)) {
+              pathPart = RegExp.$1;
+              arrayPos = +RegExp.$2;
+              config[pathPart] = config[pathPart] || [];
+              while(config[pathPart].length > arrayPos) {
+                /**
+                 * @todo peek ahead to see if this should be an array... could
+                 * that even happen? I guess it's possible to just list out your
+                 * data...
+                 */
+                config[pathPart].push({});
+              }
+              config = config[pathPart];
+              pathPart = arrayPos;
+            }
 
-      scope.$watch('labels', function(newVal) {
-        if(!newVal) { return; }
-        chart.labels = newVal;
-        chart.redraw();
-      });
+            if(ix === opt.pathDepth - 1) {
+              config[pathPart] = scope.$eval(opt.val);
+            } else {
+              config[pathPart] = config[pathPart] || {};
+            }
 
-      scope.$watch('loading', function(newVal) {
-        if(!newVal) { return; }
-        chart.loading = newVal;
-        chart.redraw();
-      });
+            config = config[pathPart];
+          }
+        }.bind(config));
 
-      scope.$watch('legend', function(newVal) {
-        if(!newVal) { return; }
-        chart.legend = newVal;
-        chart.redraw();
-      });
+        // Underlay our default settings
+        config = angular.extend(hcSettings.get(), config);
 
-      scope.$watch('navigation', function(newVal) {
-        if(!newVal) { return; }
-        chart.navigation = newVal;
-        chart.redraw();
-      });
+        // Now... force the chart container to *this* element
+        config.chart = config.chart || {};
+        config.chart.renderTo = element[0];
 
-      scope.$watch('pane', function(newVal) {
-        if(!newVal) { return; }
-        chart.pane = newVal;
-        chart.redraw();
-      });
+        return config;
+      };
 
-      scope.$watch('plotOptions', function(newVal) {
-        if(!newVal) { return; }
-        chart.plotOptions = newVal;
-        chart.redraw();
-      });
+      // Boom.
+      var chart = new Highcharts.Chart(buildConfig());
 
-      scope.$watch('series', function(newVal) {
-        if(!newVal) { return; }
-        chart.series = newVal;
-        chart.redraw();
-      });
-
-      scope.$watch('subtitle', function(newVal) {
-        if(!newVal) { return; }
-        chart.subtitle = newVal;
-        chart.redraw();
-      });
-
-      scope.$watch('title', function(newVal) {
-        if(!newVal) { return; }
-        chart.title = newVal;
-        chart.redraw();
-      });
-
-      scope.$watch('xAxis', function(newVal) {
-        if(!newVal) { return; }
-        chart.xAxis = newVal;
-        chart.redraw();
-      });
-
-      scope.$watch('xAxis', function(newVal) {
-        if(!newVal) { return; }
-        chart.xAxis = newVal;
-        chart.redraw();
-      });
-
-      scope.$watch('yAxis', function(newVal) {
-        if(!newVal) { return; }
-        chart.yAxis = newVal;
-        chart.redraw();
-      });
-
-      // -----------------------------------------------------
-      // Watch the convenience options
-      // -----------------------------------------------------
-
-      scope.$watch('chartBackgroundColor', function(newVal) {
-        if(!newVal) { return; }
-        chart.backgroundColor = newVal;
-        chart.redraw();
-      });
-
-      // Used when we have a single series
-      scope.$watch('seriesData', function(newVal) {
-        if(!newVal) { return; }
-        chart.series[0].setData(newVal);
-      }, true);
-
-      // Used when we have a single series
-      scope.$watch('seriesName', function(newVal) {
-        if(!newVal) { return; }
-        chart.series[0].update('name', newVal);
-      });
-
-      // Used when we have a single series
-      scope.$watch('seriesType', function(newVal) {
-        if(!newVal) { return; }
-        chart.series[0].update('type', newVal);
-      });
-
-      scope.$watch('subtitleText', function(newVal) {
-        if(!newVal) { return; }
-        chart.setTitle({text: (chart.title || {}).text || ''}, {text: newVal});
-      });
-
-      scope.$watch('titleText', function(newVal) {
-        if(!newVal) { return; }
-        chart.setTitle({text: newVal}, {text: (chart.subtitle || {}).text || ''});
-      });
-
-      scope.$watch('tooltipFormatter', function(newVal) {
-        if(!newVal) { return; }
-        chart.tooltipFormatter = newVal;
-        chart.redraw();
-      });
+      /**
+       * @todo Step through chartOpts and watch opt.attr redraw whenever
+       * something changes.
+       */
 
     }
+  };
+}]);
+
+angular.module('hc').provider('hcOptions', function() {
+  'use strict';
+
+  var options = {};
+
+  this.set = function(userOpts) {
+    angular.extend(options, userOpts);
+  };
+
+  this.$get = function() {
+    return {
+      get: function() {
+        return angular.copy(options);
+      }
+    };
   };
 });

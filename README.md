@@ -12,55 +12,23 @@ bower install --save jtrusell/angular-highcharts
 
 # Usage
 
-## With convenient config options...
+## Generalized config options
+
+*(hang on... stuff is changing!)*
+
+## Default Options
+
+Use `hcOptionsProvider` provider to set default options for charts in your app:
 
 ```javascript
-$scope.chartData = [
-  ['foo', 1],
-  ['bar', 2],
-  ['wowza', 3]
-];
+angular.module('myApp').config(function(hcOptionsProvider) {
+  hcOptionsProvider.set({
+    credits: {
+      enabled: false
+    }
+  });
+});
 ```
-
-```html
-<div hc-chart
-    title-text="'Awesome Chart!'"
-    seriesType="'pie'"
-    seriesName="'Slices of Pizza'"
-    data="chartData"></div>
-```
-
-[Demo](#)
-
-## ... with highcharts config options
-
-```javascript
-$scope.chartOptions = {/* ... */};
-$scope.chartSeries = [/* ... */];
-```
-
-```html
-<div hc-chart
-    chart="chartOptions"
-    series="chartSeries"></div>
-```
-
-[Demo](#)
-
-## ... or an entire Highcharts config!
-
-```javascript
-$scope.chartConfig = {/* ... */};
-```
-
-```html
-<div hc-chart="chartConfig"></div>
-```
-
-*NOTE: The `renderTo` will always be overridden to reference the element the
-`hc-chart` directive is attached to.
-
-[Demo](#)
 
 # Tests
 
