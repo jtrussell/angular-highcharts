@@ -13,8 +13,6 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
 
       var chartOpts = [];
 
-      console.log(attrs);
-
       angular.forEach(attrs, function(val, key) {
         if(key.indexOf('hc') === 0 && key.length > 2 && val) {
           // Oh snap! It's a highcharts config item!
@@ -105,11 +103,12 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
       angular.forEach(chartOpts, function(opt) {
         scope.$watch(opt.val, function(newVal) {
           if(!newVal) { return; }
+          var opts = chart.options, obj = opts, ix, p;
           if(opt.pathDepth === 0) {
             chart.destroy();
             chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+            return;
           } else {
-            var obj = chart.options, ix, p;
             for(ix = 0; ix < opt.pathDepth; ix++) {
               p = opt.path[ix];
               if(/(\w+)\[(\d+)\]$/.exec(p)) {
@@ -132,10 +131,11 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
             }
 
           }
+
           //chart.destroy();
           //chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
-          chart = new Highcharts.Chart(chart.options);
-          //chart.redraw();
+          chart.destroy();
+          chart = new Highcharts.Chart(opts);
         }, true);
       });
 
