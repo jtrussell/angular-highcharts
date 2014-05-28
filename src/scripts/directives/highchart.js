@@ -1,6 +1,6 @@
 /*global angular, Highcharts */
 
-angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions', function(HighchartsConstructor, hcSettings) {
+angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions', 'hcNormalizeOption', function(HighchartsConstructor, hcSettings, hcNormalizeOption) {
   'use strict';
   return {
     restrict: 'EA',
@@ -13,6 +13,8 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
 
       var chartOpts = [];
 
+      console.log(attrs);
+
       angular.forEach(attrs, function(val, key) {
         if(key.indexOf('hc') === 0 && key.length > 2 && val) {
           // Oh snap! It's a highcharts config item!
@@ -21,10 +23,14 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
             .replace(/^((data|x)-)?hc[:-]/, '') // remove hc- prefix
             .split('-');
 
+          var keyPartsNorm = [];
+          angular.forEach(keyParts, function(part) {
+            keyPartsNorm.push(hcNormalizeOption(part));
+          });
+
           chartOpts.push({
-            attr: key,
-            path: keyParts,
-            pathDepth: keyParts.length,
+            path: keyPartsNorm,
+            pathDepth: keyPartsNorm.length,
             val: val
           });
         }
@@ -96,10 +102,6 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
       // Boom.
       var chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
 
-      /**
-       * @todo Step through chartOpts and watch opt.attr redraw whenever
-       * something changes.
-       */
       angular.forEach(chartOpts, function(opt) {
         scope.$watch(opt.val, function(newVal) {
           if(!newVal) { return; }
