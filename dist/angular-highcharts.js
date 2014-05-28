@@ -38,20 +38,20 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
         return a.pathDepth < b.pathDepth ? -1 : 1;
       });
 
-      var buildConfig = function() {
+      var buildConfig = function(opts) {
 
         // We're going to do mean things to this array
-        var chartOpt = angular.copy(chartOpt);
+        opts = angular.copy(opts);
 
         // The config object we'll ultimately hand off to the constructor, we
         // may have been handed a top level config object but if not just start
         // with an empty object
-        var config = chartOpts.length && chartOpts[0].pathDepth === 0 ?
-          scope.$eval(chartOpts.shift()) : {};
+        var config = opts.length && opts[0].pathDepth === 0 ?
+          scope.$eval(opts.shift()) : {};
 
         // Apply config options in order of specificity, most general to most
         // specific
-        angular.forEach(chartOpts, function(opt) {
+        angular.forEach(opts, function(opt) {
           var ix, pathPart, arrayPos, config = this;
           for(ix = 0; ix < opt.pathDepth; ix++) {
             pathPart = opt.path[ix];
@@ -94,12 +94,48 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
       };
 
       // Boom.
-      var chart = new HighchartsConstructor.Chart(buildConfig());
+      var chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
 
       /**
        * @todo Step through chartOpts and watch opt.attr redraw whenever
        * something changes.
        */
+      angular.forEach(chartOpts, function(opt) {
+        scope.$watch(opt.val, function(newVal) {
+          if(!newVal) { return; }
+          if(opt.pathDepth === 0) {
+            chart.destroy();
+            chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+          } else {
+            var obj = chart.options, ix, p;
+            for(ix = 0; ix < opt.pathDepth; ix++) {
+              p = opt.path[ix];
+              if(/(\w+)\[(\d+)\]$/.exec(p)) {
+                if(ix === opt.pathDepth - 1) {
+                  //if(RegExp.$1 === 'series') {
+                  //  obj[RegExp.$1][RegExp.$2].update(scope.$eval(opt.val));
+                  //} else {
+                    obj[RegExp.$1][RegExp.$2] = scope.$eval(opt.val);
+                  //}
+                } else {
+                  obj = obj[RegExp.$1][+RegExp.$2];
+                }
+              } else {
+                if(ix === opt.pathDepth - 1) {
+                  obj[p] = scope.$eval(opt.val);
+                } else {
+                  obj = obj[p];
+                }
+              }
+            }
+
+          }
+          //chart.destroy();
+          //chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+          chart = new Highcharts.Chart(chart.options);
+          //chart.redraw();
+        }, true);
+      });
 
     }
   };
