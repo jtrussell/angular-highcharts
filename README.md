@@ -7,7 +7,7 @@ An AngularJS directive for creating Hightcharts charts.
 # Installing
 
 ```
-bower install --save jtrusell/angular-highcharts
+bower install --save jtrussell/angular-highcharts
 ```
 
 # Usage
