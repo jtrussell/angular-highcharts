@@ -67,7 +67,7 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
               pathPart = RegExp.$1;
               arrayPos = +RegExp.$2;
               config[pathPart] = config[pathPart] || [];
-              while(config[pathPart].length > arrayPos) {
+              while(config[pathPart].length < arrayPos) {
                 /**
                  * @todo peek ahead to see if this should be an array... could
                  * that even happen? I guess it's possible to just list out your
