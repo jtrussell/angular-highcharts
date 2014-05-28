@@ -1,6 +1,6 @@
 /*global angular, Highcharts */
 
-angular.module('hc').directive('highchart', ['hcOptions', function(hcSettings) {
+angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions', function(HighchartsConstructor, hcSettings) {
   'use strict';
   return {
     restrict: 'EA',
@@ -94,7 +94,7 @@ angular.module('hc').directive('highchart', ['hcOptions', function(hcSettings) {
       };
 
       // Boom.
-      var chart = new Highcharts.Chart(buildConfig());
+      var chart = new HighchartsConstructor.Chart(buildConfig());
 
       /**
        * @todo Step through chartOpts and watch opt.attr redraw whenever
