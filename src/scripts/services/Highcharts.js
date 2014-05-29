@@ -1,6 +1,6 @@
 /*global angular */
 
-angular.module('hc').provider('HighchartsConstructor', function() {
+angular.module('hc').provider('Highcharts', function() {
   'use strict';
   var Constructor = window.Highcharts;
 

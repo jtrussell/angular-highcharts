@@ -1,6 +1,6 @@
 /*global angular, Highcharts */
 
-angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions', 'hcNormalizeOption', function(HighchartsConstructor, hcSettings, hcNormalizeOption) {
+angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNormalizeOption', function(Highcharts, hcSettings, hcNormalizeOption) {
   'use strict';
   return {
     restrict: 'EA',
@@ -14,7 +14,7 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
       var chartOpts = [];
 
       angular.forEach(attrs, function(val, key) {
-        if(key.indexOf('hc') === 0 && key.length > 2 && val) {
+        if(key.indexOf('hc') === 0 && val) {
           // Oh snap! It's a highcharts config item!
           var keyParts = attrs
             .$attr[key] // raw attribute name
@@ -29,7 +29,9 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
           chartOpts.push({
             path: keyPartsNorm,
             pathDepth: keyPartsNorm.length,
-            val: val
+            val: val,
+            // Don't bother watching literals
+            watch: !(/^\d/.test(val) || /^['"].*['"]$/.test(val))
           });
         }
       });
@@ -98,15 +100,22 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
       };
 
       // Boom.
-      var chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+      var chart = new Highcharts.Chart(buildConfig(chartOpts));
 
+      // Resize the chart after container sizes are set.
+      setTimeout(function() {
+        chart.reflow();
+      });
+
+      // Setup watchers for all hcd attrs
       angular.forEach(chartOpts, function(opt) {
+        if(!opt.watch) { return; }
         scope.$watch(opt.val, function(newVal) {
           if(!newVal) { return; }
           var opts = chart.options, obj = opts, ix, p;
           if(opt.pathDepth === 0) {
             chart.destroy();
-            chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+            chart = new Highcharts.Chart(buildConfig(chartOpts));
             return;
           } else {
             for(ix = 0; ix < opt.pathDepth; ix++) {
@@ -133,7 +142,7 @@ angular.module('hc').directive('highchart', ['HighchartsConstructor', 'hcOptions
           }
 
           //chart.destroy();
-          //chart = new HighchartsConstructor.Chart(buildConfig(chartOpts));
+          //chart = new Highcharts.Chart(buildConfig(chartOpts));
           chart.destroy();
           chart = new Highcharts.Chart(opts);
         }, true);
