@@ -33,7 +33,7 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
             // Don't bother watching literals
             watch: !(/^\d/.test(val) ||
               /^['"].*['"]$/.test(val) ||
-              /null|undefined/.test(val) ||
+              /true|false|null|undefined/.test(val) ||
               /hcStatic/.test(key)),
             // Options that require a completely new chart when they change
             recreate: keyPartsNorm.length === 0
