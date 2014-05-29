@@ -18,7 +18,7 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
           // Oh snap! It's a highcharts config item!
           var keyParts = attrs
             .$attr[key] // raw attribute name
-            .replace(/^((data|x)-)?hc[:-]/, '') // remove hc- prefix
+            .replace(/^((data|x)-)?hc(-static)?[:-]/, '') // remove hc- prefix
             .split('-');
 
           var keyPartsNorm = [];
@@ -31,7 +31,12 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
             pathDepth: keyPartsNorm.length,
             val: val,
             // Don't bother watching literals
-            watch: !(/^\d/.test(val) || /^['"].*['"]$/.test(val))
+            watch: !(/^\d/.test(val) ||
+              /^['"].*['"]$/.test(val) ||
+              /null|undefined/.test(val) ||
+              /hcStatic/.test(key)),
+            // Options that require a completely new chart when they change
+            recreate: keyPartsNorm.length === 0
           });
         }
       });
@@ -112,23 +117,27 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
         if(!opt.watch) { return; }
         scope.$watch(opt.val, function(newVal) {
           if(!newVal) { return; }
-          var opts = chart.options, obj = opts, ix, p;
-          if(opt.pathDepth === 0) {
+          if(opt.recreate === 0) {
             chart.destroy();
             chart = new Highcharts.Chart(buildConfig(chartOpts));
             return;
           } else {
+            var opts = chart.options
+              , obj = opts
+              , ix, p, pIx;
             for(ix = 0; ix < opt.pathDepth; ix++) {
               p = opt.path[ix];
               if(/(\w+)\[(\d+)\]$/.exec(p)) {
+                p = RegExp.$1;
+                pIx = +RegExp.$2;
                 if(ix === opt.pathDepth - 1) {
-                  //if(RegExp.$1 === 'series') {
-                  //  obj[RegExp.$1][RegExp.$2].update(scope.$eval(opt.val));
+                  //if(p === 'series') {
+                  //  obj[p][pIx].update(scope.$eval(opt.val));
                   //} else {
-                    obj[RegExp.$1][RegExp.$2] = scope.$eval(opt.val);
+                  obj[p][pIx] = scope.$eval(opt.val);
                   //}
                 } else {
-                  obj = obj[RegExp.$1][+RegExp.$2];
+                  obj = obj[p][pIx];
                 }
               } else {
                 if(ix === opt.pathDepth - 1) {
@@ -138,13 +147,16 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
                 }
               }
             }
-
+            /**
+             * @todo How can we handle this better?
+             * - Take different action on series changes?
+             * - Series data changes...
+             * - Other items that require more than a redraw?
+             */
+            chart.destroy();
+            chart = new Highcharts.Chart(opts);
           }
 
-          //chart.destroy();
-          //chart = new Highcharts.Chart(buildConfig(chartOpts));
-          chart.destroy();
-          chart = new Highcharts.Chart(opts);
         }, true);
       });
 
