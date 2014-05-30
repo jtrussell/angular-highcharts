@@ -70,6 +70,14 @@ module.exports = function(grunt) {
         commitFiles: ['-a'],
         push: false
       }
+    },
+
+    karma: {
+      spec: {
+        confgFile: 'karma.conf.js',
+        singleRun: true,
+        autoWatch: false
+      }
     }
   });
 
@@ -90,6 +98,8 @@ module.exports = function(grunt) {
     'clean:pages',
     'copy:pages'
   ]);
+
+  grunt.registerTask('test', ['karma']);
 
 };
 
