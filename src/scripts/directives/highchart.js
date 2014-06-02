@@ -1,6 +1,6 @@
 /*global angular, Highcharts */
 
-angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcOptions', 'hcNormalizeOption', function($timeout, Highcharts, hcSettings, hcNormalizeOption) {
+angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcNormalizeOption', function($timeout, Highcharts, hcNormalizeOption) {
   'use strict';
   return {
     restrict: 'EA',
@@ -89,15 +89,14 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcOption
           }
         }.bind(config));
 
-        // Underlay our default settings
-        config = angular.extend(hcSettings.get(), config);
-
         // Now... force the chart container to *this* element
         config.chart = config.chart || {};
         config.chart.renderTo = element[0];
 
         return config;
       };
+
+      console.log(buildConfig(chartOpts));
 
       // Boom.
       var chart = new Highcharts.Chart(buildConfig(chartOpts));
