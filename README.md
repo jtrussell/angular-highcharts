@@ -77,7 +77,20 @@ angular.module('myApp').config(function(hcOptionsProvider) {
 
 # Tests
 
-_(coming soon)_
+Tests are run with grunt and karma. For a single test run make sure you have grunt
+installed globally, checkout this repo and run:
+
+```
+npm install
+npm test
+```
+
+To run tests continuously during development you'll need karma installed globally,
+then run:
+
+```
+karma start karma.config.js
+```
 
 # License
 
