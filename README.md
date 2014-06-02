@@ -26,32 +26,36 @@ directive plus `hc-*` attributes to build your chart.
 
 The element attributes are parsed dynamically and converted into a config object
 to be passed to the `Highcarts.Chart` constructor. By default none of these
-values are watched for changes. If you'd like a particular attribute to be
-watched use `hc-watch-*` instead of `hc-*`.
+values are watched for changes. Watching config these attributes and
+automatically updating the chart as needed is on the roadmanp.
 
 ```html
-<!-- 
-  The hc-watch-* causes the 0th series data object to $watched for changes.
--->
 <div highchart
   hc-title-text="'My Awesome Chart'"
+  hc-series[0]-name="'My Data'"
   hc-series[0]-data="myData"
   hc-series[1]-data="myOtherData"
 </div>
 ```
 
-Attributes are converted to config obj properties by stripping away the `hc-[static-]`
-prefix then using dashes to denote nesting, for example:
-
-`hc-series[0]-data="myData"`
-
-Becomes:
+Attributes are converted to config obj properties by stripping away the `hc-`
+prefix then using dashes to denote nesting. For example, the above snippet will
+create a chart using the following config object:
 
 ```javascript
 {
+  title: {
+    text: 'My Awesome Chart'
+  },
   series: [{
+    name: 'My Data',
     data: myData
-  ]]
+  },{
+    data: myOtherData
+  }],
+  chart: {
+    renderTo: /* always the element the directive is attached to */
+  }
 }
 ```
 

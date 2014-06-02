@@ -107,53 +107,61 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcOption
         chart.reflow();
       });
 
-      // Setup watchers for dynamic hc-* attrs
-      angular.forEach(chartOpts, function(opt) {
-        if(!opt.watch) { return; }
-        scope.$watch(opt.val, function(newVal) {
-          if(!newVal) { return; }
-          if(opt.recreate === 0) {
-            chart.destroy();
-            chart = new Highcharts.Chart(buildConfig(chartOpts));
-            return;
-          } else {
-            var opts = chart.options
-              , obj = opts
-              , ix, p, pIx;
-            for(ix = 0; ix < opt.pathDepth; ix++) {
-              p = opt.path[ix];
-              if(/(\w+)\[(\d+)\]$/.exec(p)) {
-                p = RegExp.$1;
-                pIx = +RegExp.$2;
-                if(ix === opt.pathDepth - 1) {
-                  //if(p === 'series') {
-                  //  obj[p][pIx].update(scope.$eval(opt.val));
-                  //} else {
-                  obj[p][pIx] = scope.$eval(opt.val);
-                  //}
-                } else {
-                  obj = obj[p][pIx];
-                }
-              } else {
-                if(ix === opt.pathDepth - 1) {
-                  obj[p] = scope.$eval(opt.val);
-                } else {
-                  obj = obj[p];
-                }
-              }
-            }
-            /**
-             * @todo How can we handle this better?
-             * - Take different action on series changes?
-             * - Series data changes...
-             * - Other items that require more than a redraw?
-             */
-            chart.destroy();
-            chart = new Highcharts.Chart(opts);
-          }
+      /**
+       * @todo Setup watchers for dynamic hc-* attrs
+       * We'll need to inspect the attribute being updated and take appropriate
+       * action:
+       *  - addSeries / updateSeries
+       *  - setTitle
+       *  - ...
+       */
+      
+      // angular.forEach(chartOpts, function(opt) {
+      //   if(!opt.watch) { return; }
+      //   scope.$watch(opt.val, function(newVal) {
+      //     if(!newVal) { return; }
+      //     if(opt.recreate === 0) {
+      //       chart.destroy();
+      //       chart = new Highcharts.Chart(buildConfig(chartOpts));
+      //       return;
+      //     } else {
+      //       var opts = chart.options
+      //         , obj = opts
+      //         , ix, p, pIx;
+      //       for(ix = 0; ix < opt.pathDepth; ix++) {
+      //         p = opt.path[ix];
+      //         if(/(\w+)\[(\d+)\]$/.exec(p)) {
+      //           p = RegExp.$1;
+      //           pIx = +RegExp.$2;
+      //           if(ix === opt.pathDepth - 1) {
+      //             //if(p === 'series') {
+      //             //  obj[p][pIx].update(scope.$eval(opt.val));
+      //             //} else {
+      //             obj[p][pIx] = scope.$eval(opt.val);
+      //             //}
+      //           } else {
+      //             obj = obj[p][pIx];
+      //           }
+      //         } else {
+      //           if(ix === opt.pathDepth - 1) {
+      //             obj[p] = scope.$eval(opt.val);
+      //           } else {
+      //             obj = obj[p];
+      //           }
+      //         }
+      //       }
+      //       /**
+      //        * @todo How can we handle this better?
+      //        * - Take different action on series changes?
+      //        * - Series data changes...
+      //        * - Other items that require more than a redraw?
+      //        */
+      //       chart.destroy();
+      //       chart = new Highcharts.Chart(opts);
+      //     }
 
-        }, true);
-      });
+      //   }, true);
+      // });
 
     }
   };
