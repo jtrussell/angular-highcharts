@@ -25,23 +25,17 @@ directive plus `hc-*` attributes to build your chart.
 ```
 
 The element attributes are parsed dynamically and converted into a config object
-to be passed to the `Highcarts.Chart` constructor. Variable values are watched
-for changes while literals are not explicitly watched. You may also use the attribute
-prefix `hc-static-*` to block watching:
+to be passed to the `Highcarts.Chart` constructor. By default none of these
+values are watched for changes. If you'd like a particular attribute to be
+watched use `hc-watch-*` instead of `hc-*`.
 
 ```html
 <!-- 
-  The hc-static-* forces the the series object to not be watched
-  even though it is a variable.
-  
-  hc-title-text has a string literal value and will not be watched
-  for changes automatically.
-  
-  The hc-series[1]-data value myOtherData will be watched for changes.
+  The hc-watch-* causes the 0th series data object to $watched for changes.
 -->
 <div highchart
   hc-title-text="'My Awesome Chart'"
-  hc-static-series[0]-data="myData"
+  hc-series[0]-data="myData"
   hc-series[1]-data="myOtherData"
 </div>
 ```
