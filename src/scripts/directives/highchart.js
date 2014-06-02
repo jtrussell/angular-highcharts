@@ -1,6 +1,6 @@
 /*global angular, Highcharts */
 
-angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNormalizeOption', function(Highcharts, hcSettings, hcNormalizeOption) {
+angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcOptions', 'hcNormalizeOption', function($timeout, Highcharts, hcSettings, hcNormalizeOption) {
   'use strict';
   return {
     restrict: 'EA',
@@ -18,7 +18,7 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
           // Oh snap! It's a highcharts config item!
           var keyParts = attrs
             .$attr[key] // raw attribute name
-            .replace(/^((data|x)-)?hc(-static)?[:-]/, '') // remove hc- prefix
+            .replace(/^((data|x)-)?hc(-watch)?[:-]/, '') // remove hc- prefix
             .split('-');
 
           var keyPartsNorm = [];
@@ -30,13 +30,8 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
             path: keyPartsNorm,
             pathDepth: keyPartsNorm.length,
             val: val,
-            // Don't bother watching literals
-            watch: !(/^\d/.test(val) ||
-              /^['"].*["']$/.test(val) ||
-              /true|false|null|undefined/.test(val) ||
-              /hcStatic/.test(key)),
-            // Options that require a completely new chart when they change
-            recreate: keyPartsNorm.length === 0
+            watch: /hcWatch/.test(key), // Watch these only
+            recreate: keyPartsNorm.length === 0 // Options that require a completely new chart when they change
           });
         }
       });
@@ -108,11 +103,11 @@ angular.module('hc').directive('highchart', ['Highcharts', 'hcOptions', 'hcNorma
       var chart = new Highcharts.Chart(buildConfig(chartOpts));
 
       // Resize the chart after container sizes are set.
-      setTimeout(function() {
+      $timeout(function() {
         chart.reflow();
       });
 
-      // Setup watchers for all hcd attrs
+      // Setup watchers for dynamic hc-* attrs
       angular.forEach(chartOpts, function(opt) {
         if(!opt.watch) { return; }
         scope.$watch(opt.val, function(newVal) {
