@@ -96,8 +96,6 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcNormal
         return config;
       };
 
-      console.log(buildConfig(chartOpts));
-
       // Boom.
       var chart = new Highcharts.Chart(buildConfig(chartOpts));
 
