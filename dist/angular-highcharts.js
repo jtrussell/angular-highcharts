@@ -101,8 +101,22 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcNormal
         return config;
       };
 
+      /**
+       * Use the `highchart-deferred` attribute to provide a deferred we should
+       * resolve to the chart.
+       */
+      var done = angular.noop;
+      if(attrs.highchartDeferred) {
+        var chartDeferred = scope.$eval(attrs.highchartDeferred);
+        done = function(chart) {
+          $timeout(function() {
+            chartDeferred.resolve(chart);
+          });
+        };
+      }
+
       // Boom.
-      var chart = new Highcharts.Chart(buildConfig(chartOpts));
+      var chart = new Highcharts.Chart(buildConfig(chartOpts), done);
 
       // Resize the chart after container sizes are set.
       $timeout(function() {

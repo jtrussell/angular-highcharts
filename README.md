@@ -73,18 +73,43 @@ angular.module('myApp').config(function(hcOptionsProvider) {
 });
 ```
 
+## Extras
+
+### Promises Promises
+
+Often you'll want a reference to your chart in a controller somewhere. Use the
+`highchart-deferred` attribute to provide a deferred object which this directive
+will resolve to your chart object when it's ready:
+
+```javascript
+// In your controller
+$scope.chartDeferred = $q.defer();
+
+var chartPromise = $scope.chartDeferred.promise;
+chartPromise.then(function(chart) {
+  // Hooray the chart object!
+});
+```
+
+```html
+<!-- In your view -->
+<div highchart highchart-deferred="chartDeferred"
+  hc-series[0]-name="'Awesome'"
+  hc-series[0]-data="[[1,2],[3,4]]"></div>
+```
+
 # Tests
 
-Tests are run with grunt and karma. For a single test run make sure you have grunt
-installed globally, checkout this repo and run:
+Tests are run with grunt and karma. For a single test run make sure you have
+grunt installed globally, checkout this repo and run:
 
 ```
 npm install
 npm test
 ```
 
-To run tests continuously during development you'll need karma installed globally,
-then run:
+To run tests continuously during development you'll need karma installed
+globally, then run:
 
 ```
 karma start karma.config.js
