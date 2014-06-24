@@ -118,6 +118,10 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcNormal
         chart.reflow();
       });
 
+      scope.$on('event_hcReflow', function() {
+        chart.reflow();
+      });
+
       /**
        * @todo Setup watchers for dynamic hc-* attrs
        * We'll need to inspect the attribute being updated and take appropriate

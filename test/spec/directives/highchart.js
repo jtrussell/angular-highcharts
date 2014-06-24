@@ -17,7 +17,8 @@ describe('Directive: highchart', function() {
         };
       });
       HighchartsProvider.use({
-        Chart: ChartSpy
+        Chart: ChartSpy,
+        setOptions: angular.noop
       });
     });
   });
@@ -53,7 +54,7 @@ describe('Directive: highchart', function() {
         series: [{
           data: [[1,2],[3,4]]
         }]
-      });
+      }, jasmine.any(Function));
     });
   });
 });

@@ -98,6 +98,14 @@ chartPromise.then(function(chart) {
   hc-series[0]-data="[[1,2],[3,4]]"></div>
 ```
 
+### Requesting a Resize
+
+Highcharts charts need to be manually reflowed whenever their containers change
+size. This directive will reflow charts whenever `'event_hcReflow'` event is
+detected. So rather than worrying about all the charts you may have affected
+just `$scope.$broadcast('event_hcReflow')`.
+
+
 # Tests
 
 Tests are run with grunt and karma. For a single test run make sure you have
