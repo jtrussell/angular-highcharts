@@ -68,7 +68,7 @@ angular.module('hc').directive('highchart', ['$timeout', 'Highcharts', 'hcNormal
             pathPart = opt.path[ix];
 
             // Could be part of an array...
-            if(/(\w+)\[(\d+)\]$/.exec(pathPart)) {
+            if(/([a-zA-z]+)\[?(\d+)\]?$/.exec(pathPart)) {
               pathPart = RegExp.$1;
               arrayPos = +RegExp.$2;
               config[pathPart] = config[pathPart] || [];

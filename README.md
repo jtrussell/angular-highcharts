@@ -24,6 +24,16 @@ directive plus `hc-*` attributes to build your chart.
 </div>
 ```
 
+Strictly speaking the square brackets in `hc-series[0]-data` could get you into
+trouble, so they're optional. This is also fine:
+
+```html
+<div highchart
+  hc-title-text="'My Awesome Chart'"
+  hc-series0-data="[[1,2],[3,4]]"
+</div>
+```
+
 The element attributes are parsed dynamically and converted into a config object
 to be passed to the `Highcarts.Chart` constructor. By default none of these
 values are watched for changes. Watching config these attributes and
