@@ -87,12 +87,13 @@ angular.module('myApp').config(function(hcOptionsProvider) {
 
 ### Promises Promises
 
-Often you'll want a reference to your chart in a controller somewhere. Use the
-`highchart-deferred` attribute to provide a deferred object which this directive
-will resolve to your chart object when it's ready:
+Often you'll want a reference to your chart in a controller or elsewhere. Use
+the `highchart-deferred` attribute to provide a deferred object which this
+directive will resolve to your chart object when it's ready:
+
 
 ```javascript
-// In your controller
+// E.g. In your controller
 $scope.chartDeferred = $q.defer();
 
 var chartPromise = $scope.chartDeferred.promise;
