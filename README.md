@@ -36,8 +36,8 @@ trouble, so they're optional. This is also fine:
 
 The element attributes are parsed dynamically and converted into a config object
 to be passed to the `Highcarts.Chart` constructor. By default none of these
-values are watched for changes. Watching config these attributes and
-automatically updating the chart as needed is on the roadmanp.
+values are watched for changes. Watching these config attributes and
+automatically updating the chart as needed is on the roadmap (PRs welcome!).
 
 ```html
 <div highchart
